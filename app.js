@@ -2,34 +2,50 @@
 // LJUD
 // ========================================
 
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const audioContext =
+    new (window.AudioContext || window.webkitAudioContext)();
+
 
 function playBeep() {
 
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gainNode =
+        audioContext.createGain();
+
 
     oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+
+    gainNode.connect(
+        audioContext.destination
+    );
+
 
     oscillator.frequency.value = 800;
+
     oscillator.type = "sine";
+
 
     gainNode.gain.setValueAtTime(
         0.3,
         audioContext.currentTime
     );
 
+
     gainNode.gain.exponentialRampToValueAtTime(
         0.01,
         audioContext.currentTime + 0.15
     );
 
+
     oscillator.start();
+
 
     oscillator.stop(
         audioContext.currentTime + 0.15
     );
+
 }
 
 
@@ -57,17 +73,22 @@ let totalRepetitions;
 const startButton =
     document.getElementById("startButton");
 
+
 const stopButton =
     document.getElementById("stopButton");
+
 
 const timerSection =
     document.getElementById("timerSection");
 
+
 const phaseDisplay =
     document.getElementById("phase");
 
+
 const timerDisplay =
     document.getElementById("timer");
+
 
 const repetitionDisplay =
     document.getElementById("repetition");
@@ -77,61 +98,70 @@ const repetitionDisplay =
 // STARTA TRÄNING
 // ========================================
 
-startButton.addEventListener("click", function () {
+startButton.addEventListener(
+    "click",
+    function () {
 
-    // Aktivera ljudet
-    if (audioContext.state === "suspended") {
-        audioContext.resume();
+        // Aktivera ljudet
+
+        if (
+            audioContext.state === "suspended"
+        ) {
+
+            audioContext.resume();
+
+        }
+
+
+        // Hämta användarens inställningar
+
+        intervalSeconds =
+            Number(
+                document
+                    .getElementById("intervalTime")
+                    .value
+            );
+
+
+        restSeconds =
+            Number(
+                document
+                    .getElementById("restTime")
+                    .value
+            );
+
+
+        totalRepetitions =
+            Number(
+                document
+                    .getElementById("repetitions")
+                    .value
+            );
+
+
+        // Börja på repetition 1
+
+        currentRepetition = 1;
+
+
+        // Visa timer
+
+        timerSection.style.display =
+            "block";
+
+
+        // Dölj startknappen
+
+        startButton.style.display =
+            "none";
+
+
+        // Starta första intervallet
+
+        startInterval();
+
     }
-
-
-    // Hämta användarens inställningar
-
-    const intervalMinutes =
-        Number(
-            document.getElementById("intervalTime").value
-        );
-
-    const restMinutes =
-        Number(
-            document.getElementById("restTime").value
-        );
-
-    totalRepetitions =
-        Number(
-            document.getElementById("repetitions").value
-        );
-
-
-    // Omvandla minuter till sekunder
-
-    intervalSeconds =
-        intervalMinutes * 60;
-
-    restSeconds =
-        restMinutes * 60;
-
-
-    // Börja på repetition 1
-
-    currentRepetition = 1;
-
-
-    // Visa timer
-
-    timerSection.style.display = "block";
-
-
-    // Dölj startknappen
-
-    startButton.style.display = "none";
-
-
-    // Starta första intervallet
-
-    startInterval();
-
-});
+);
 
 
 // ========================================
@@ -151,58 +181,60 @@ function startInterval() {
     updateDisplay();
 
 
-    // Säkerställ att det inte finns någon gammal timer
-
     clearInterval(timer);
 
 
-    // Starta nedräkningen
+    timer =
+        setInterval(
+            function () {
 
-    timer = setInterval(function () {
-
-        timeLeft--;
-
-
-        updateDisplay();
+                timeLeft--;
 
 
-        // Pip vid 3, 2 och 1 sekund kvar
-
-        if (
-            timeLeft <= 3 &&
-            timeLeft > 0
-        ) {
-
-            playBeep();
-
-        }
+                updateDisplay();
 
 
-        // När intervallet är slut
+                // Pip vid 3, 2 och 1 sekund kvar
 
-        if (timeLeft <= 0) {
+                if (
+                    timeLeft <= 3 &&
+                    timeLeft > 0
+                ) {
 
-            clearInterval(timer);
+                    playBeep();
+
+                }
 
 
-            // Finns det fler repetitioner?
+                // När intervallet är slut
 
-            if (
-                currentRepetition <
-                totalRepetitions
-            ) {
+                if (timeLeft <= 0) {
 
-                startRest();
+                    clearInterval(timer);
 
-            } else {
 
-                finishWorkout();
+                    // Finns det fler repetitioner?
 
-            }
+                    if (
+                        currentRepetition <
+                        totalRepetitions
+                    ) {
 
-        }
+                        startRest();
 
-    }, 1000);
+                    }
+
+                    else {
+
+                        finishWorkout();
+
+                    }
+
+                }
+
+            },
+            1000
+        );
 
 }
 
@@ -227,45 +259,47 @@ function startRest() {
     clearInterval(timer);
 
 
-    // Starta nedräkningen
+    timer =
+        setInterval(
+            function () {
 
-    timer = setInterval(function () {
-
-        timeLeft--;
-
-
-        updateDisplay();
+                timeLeft--;
 
 
-        // Pip vid 3, 2 och 1 sekund kvar
-
-        if (
-            timeLeft <= 3 &&
-            timeLeft > 0
-        ) {
-
-            playBeep();
-
-        }
+                updateDisplay();
 
 
-        // När vilan är slut
+                // Pip vid 3, 2 och 1 sekund kvar
 
-        if (timeLeft <= 0) {
+                if (
+                    timeLeft <= 3 &&
+                    timeLeft > 0
+                ) {
 
-            clearInterval(timer);
+                    playBeep();
+
+                }
 
 
-            // Gå till nästa repetition
+                // När vilan är slut
 
-            currentRepetition++;
+                if (timeLeft <= 0) {
+
+                    clearInterval(timer);
 
 
-            startInterval();
+                    // Gå till nästa repetition
 
-        }
+                    currentRepetition++;
 
-    }, 1000);
+
+                    startInterval();
+
+                }
+
+            },
+            1000
+        );
 
 }
 
@@ -277,7 +311,9 @@ function startRest() {
 function updateDisplay() {
 
     const minutes =
-        Math.floor(timeLeft / 60);
+        Math.floor(
+            timeLeft / 60
+        );
 
 
     const seconds =
@@ -286,11 +322,13 @@ function updateDisplay() {
 
     timerDisplay.textContent =
 
-        String(minutes).padStart(2, "0")
+        String(minutes)
+            .padStart(2, "0")
 
         + ":"
 
-        + String(seconds).padStart(2, "0");
+        + String(seconds)
+            .padStart(2, "0");
 
 
     repetitionDisplay.textContent =
@@ -341,20 +379,23 @@ function finishWorkout() {
 // STOPPA TRÄNING
 // ========================================
 
-stopButton.addEventListener("click", function () {
+stopButton.addEventListener(
+    "click",
+    function () {
 
-    clearInterval(timer);
-
-
-    timerSection.style.display =
-        "none";
+        clearInterval(timer);
 
 
-    startButton.style.display =
-        "block";
+        timerSection.style.display =
+            "none";
 
 
-    startButton.textContent =
-        "STARTA TRÄNING";
+        startButton.style.display =
+            "block";
 
-});
+
+        startButton.textContent =
+            "STARTA TRÄNING";
+
+    }
+);

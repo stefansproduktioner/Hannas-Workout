@@ -14,50 +14,66 @@
         <h1>Intervallträning</h1>
         <p class="subtitle">Ställ in ditt träningspass</p>
 
+
         <div class="settings">
 
+            <!-- INTERVALLTID -->
             <div class="setting">
+
                 <label for="intervalTime">
                     Hur lång intervall vill du ha?
                 </label>
 
                 <select id="intervalTime">
-                    <option value="1">1 minut</option>
-                    <option value="2">2 minuter</option>
-                    <option value="3">3 minuter</option>
-                    <option value="4">4 minuter</option>
-                    <option value="5">5 minuter</option>
-                    <option value="6">6 minuter</option>
-                    <option value="7">7 minuter</option>
-                    <option value="8">8 minuter</option>
-                    <option value="9">9 minuter</option>
-                    <option value="10">10 minuter</option>
+
+                    <option value="20">00:20</option>
+                    <option value="40">00:40</option>
+                    <option value="60">01:00</option>
+                    <option value="80">01:20</option>
+                    <option value="100">01:40</option>
+                    <option value="120">02:00</option>
+                    <option value="140">02:20</option>
+                    <option value="160">02:40</option>
+                    <option value="180">03:00</option>
+
                 </select>
+
             </div>
 
 
+            <!-- VILOTID -->
             <div class="setting">
+
                 <label for="restTime">
                     Hur lång vila vill du ha?
                 </label>
 
                 <select id="restTime">
-                    <option value="0.5">0,5 minuter</option>
-                    <option value="1">1 minut</option>
-                    <option value="1.5">1,5 minuter</option>
-                    <option value="2">2 minuter</option>
-                    <option value="2.5">2,5 minuter</option>
-                    <option value="3">3 minuter</option>
+
+                    <option value="20">00:20</option>
+                    <option value="40">00:40</option>
+                    <option value="60">01:00</option>
+                    <option value="80">01:20</option>
+                    <option value="100">01:40</option>
+                    <option value="120">02:00</option>
+                    <option value="140">02:20</option>
+                    <option value="160">02:40</option>
+                    <option value="180">03:00</option>
+
                 </select>
+
             </div>
 
 
+            <!-- REPETITIONER -->
             <div class="setting">
+
                 <label for="repetitions">
                     Hur många gånger vill du repetera?
                 </label>
 
                 <select id="repetitions">
+
                     <option value="2">2 gånger</option>
                     <option value="3">3 gånger</option>
                     <option value="4">4 gånger</option>
@@ -67,26 +83,38 @@
                     <option value="8">8 gånger</option>
                     <option value="9">9 gånger</option>
                     <option value="10">10 gånger</option>
+
                 </select>
+
             </div>
 
         </div>
 
 
-        <button id="startButton">STARTA TRÄNING</button>
+        <!-- START -->
+        <button id="startButton">
+            STARTA TRÄNING
+        </button>
 
 
+        <!-- TIMER -->
         <div id="timerSection" class="timer-section">
 
-            <div id="phase">Redo?</div>
+            <div id="phase">
+                Redo?
+            </div>
 
-            <div id="timer">00:00</div>
+            <div id="timer">
+                00:00
+            </div>
 
             <div id="repetition">
                 Repetition 0 / 0
             </div>
 
-            <button id="stopButton">STOPPA</button>
+            <button id="stopButton">
+                STOPPA
+            </button>
 
         </div>
 
