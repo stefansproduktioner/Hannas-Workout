@@ -10,63 +10,264 @@
 let audioContext = null;
 
 
-function initAudio() {
+function createAudioContext() {
 
-    if (!audioContext) {
-
-        audioContext = new (
-            window.AudioContext ||
-            window.webkitAudioContext
-        )();
-
+    if (audioContext) {
+        return audioContext;
     }
 
-    if (audioContext.state === "suspended") {
 
-        audioContext.resume();
+    const AudioContextClass =
+        window.AudioContext ||
+        window.webkitAudioContext;
 
+
+    if (!AudioContextClass) {
+
+        console.log(
+            "Web Audio stöds inte av denna webbläsare."
+        );
+
+        return null;
     }
+
+
+    audioContext =
+        new AudioContextClass();
+
+
+    return audioContext;
 }
 
 
-function playBeep() {
+// Den här funktionen körs direkt när
+// användaren trycker på STARTA.
 
-    if (!audioContext) {
+async function prepareAudio() {
+
+    const context =
+        createAudioContext();
+
+
+    if (!context) {
         return;
     }
 
-    const oscillator = audioContext.createOscillator();
 
-    const gainNode = audioContext.createGain();
+    try {
 
+        if (context.state === "suspended") {
 
-    oscillator.connect(gainNode);
+            await context.resume();
 
-    gainNode.connect(audioContext.destination);
+        }
 
+    } catch (error) {
 
-    oscillator.frequency.value = 800;
+        console.log(
+            "Kunde inte starta ljudet:",
+            error
+        );
 
-    oscillator.type = "sine";
+    }
 
-
-    gainNode.gain.setValueAtTime(
-        0.3,
-        audioContext.currentTime
-    );
-
-
-    gainNode.gain.exponentialRampToValueAtTime(
-        0.001,
-        audioContext.currentTime + 0.15
-    );
+}
 
 
-    oscillator.start();
+// ==========================================
+// PIP
+// ==========================================
 
-    oscillator.stop(
-        audioContext.currentTime + 0.15
-    );
+function playBeep() {
+
+    const context =
+        createAudioContext();
+
+
+    if (!context) {
+        return;
+    }
+
+
+    try {
+
+        // Försök väcka ljudmotorn igen
+        // om webbläsaren har pausat den.
+
+        if (context.state === "suspended") {
+
+            context.resume();
+
+        }
+
+
+        const oscillator =
+            context.createOscillator();
+
+
+        const gainNode =
+            context.createGain();
+
+
+        oscillator.connect(
+            gainNode
+        );
+
+
+        gainNode.connect(
+            context.destination
+        );
+
+
+        oscillator.type =
+            "sine";
+
+
+        oscillator.frequency.setValueAtTime(
+            880,
+            context.currentTime
+        );
+
+
+        gainNode.gain.setValueAtTime(
+            0.001,
+            context.currentTime
+        );
+
+
+        gainNode.gain.exponentialRampToValueAtTime(
+            0.35,
+            context.currentTime + 0.01
+        );
+
+
+        gainNode.gain.exponentialRampToValueAtTime(
+            0.001,
+            context.currentTime + 0.18
+        );
+
+
+        oscillator.start(
+            context.currentTime
+        );
+
+
+        oscillator.stop(
+            context.currentTime + 0.2
+        );
+
+    } catch (error) {
+
+        console.log(
+            "Kunde inte spela pip:",
+            error
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// KLAR-LJUD
+// ==========================================
+
+function playFinishSound() {
+
+    const context =
+        createAudioContext();
+
+
+    if (!context) {
+        return;
+    }
+
+
+    try {
+
+        if (context.state === "suspended") {
+
+            context.resume();
+
+        }
+
+
+        const oscillator =
+            context.createOscillator();
+
+
+        const gainNode =
+            context.createGain();
+
+
+        oscillator.connect(
+            gainNode
+        );
+
+
+        gainNode.connect(
+            context.destination
+        );
+
+
+        oscillator.type =
+            "sine";
+
+
+        oscillator.frequency.setValueAtTime(
+            600,
+            context.currentTime
+        );
+
+
+        oscillator.frequency.setValueAtTime(
+            800,
+            context.currentTime + 0.18
+        );
+
+
+        oscillator.frequency.setValueAtTime(
+            1000,
+            context.currentTime + 0.36
+        );
+
+
+        gainNode.gain.setValueAtTime(
+            0.001,
+            context.currentTime
+        );
+
+
+        gainNode.gain.exponentialRampToValueAtTime(
+            0.35,
+            context.currentTime + 0.02
+        );
+
+
+        gainNode.gain.exponentialRampToValueAtTime(
+            0.001,
+            context.currentTime + 0.55
+        );
+
+
+        oscillator.start(
+            context.currentTime
+        );
+
+
+        oscillator.stop(
+            context.currentTime + 0.6
+        );
+
+    } catch (error) {
+
+        console.log(
+            "Kunde inte spela slutsignal:",
+            error
+        );
+
+    }
+
 }
 
 
@@ -76,9 +277,39 @@ function playBeep() {
 
 function vibrate() {
 
-    if ("vibrate" in navigator) {
+    if (
+        "vibrate" in navigator &&
+        typeof navigator.vibrate === "function"
+    ) {
 
-        navigator.vibrate(100);
+        try {
+
+            const result =
+                navigator.vibrate(120);
+
+
+            if (!result) {
+
+                console.log(
+                    "Webbläsaren kunde inte vibrera."
+                );
+
+            }
+
+        } catch (error) {
+
+            console.log(
+                "Vibration stöds inte:",
+                error
+            );
+
+        }
+
+    } else {
+
+        console.log(
+            "Vibration API stöds inte."
+        );
 
     }
 
@@ -86,71 +317,260 @@ function vibrate() {
 
 
 // ==========================================
+// SCREEN WAKE LOCK
+// ==========================================
+
+let wakeLock = null;
+
+let workoutIsRunning = false;
+
+
+// Begär att skärmen hålls aktiv.
+
+async function requestWakeLock() {
+
+    if (
+        !("wakeLock" in navigator)
+    ) {
+
+        wakeLockStatus.textContent =
+            "Skärmaktivitet stöds inte här";
+
+        return;
+
+    }
+
+
+    if (
+        document.visibilityState !== "visible"
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        wakeLock =
+            await navigator.wakeLock.request(
+                "screen"
+            );
+
+
+        wakeLockStatus.textContent =
+            "🔒 Skärmen hålls aktiv";
+
+
+        // Om systemet själv släpper wake lock
+        // försöker vi få tillbaka den senare.
+
+        wakeLock.addEventListener(
+            "release",
+            function () {
+
+                wakeLock = null;
+
+
+                if (workoutIsRunning) {
+
+                    wakeLockStatus.textContent =
+                        "🔄 Försöker hålla skärmen aktiv";
+
+                }
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.log(
+            "Wake Lock kunde inte aktiveras:",
+            error
+        );
+
+
+        wakeLockStatus.textContent =
+            "Skärmen kan stängas av av systemet";
+
+    }
+
+}
+
+
+// Släpp wake lock när träningen är klar.
+
+async function releaseWakeLock() {
+
+    if (!wakeLock) {
+        return;
+    }
+
+
+    try {
+
+        await wakeLock.release();
+
+    } catch (error) {
+
+        console.log(
+            "Kunde inte släppa Wake Lock:",
+            error
+        );
+
+    }
+
+
+    wakeLock = null;
+
+}
+
+
+// Om användaren exempelvis går till en annan app
+// kan Wake Lock släppas. När sidan blir synlig
+// igen försöker vi aktivera den på nytt.
+
+document.addEventListener(
+    "visibilitychange",
+    async function () {
+
+        if (
+            document.visibilityState === "visible" &&
+            workoutIsRunning &&
+            !wakeLock
+        ) {
+
+            await requestWakeLock();
+
+        }
+
+    }
+);
+
+
+// ==========================================
 // DOM
 // ==========================================
 
 const standardModeButton =
-    document.getElementById("standardModeButton");
+    document.getElementById(
+        "standardModeButton"
+    );
+
 
 const stairModeButton =
-    document.getElementById("stairModeButton");
+    document.getElementById(
+        "stairModeButton"
+    );
 
 
 const standardSettings =
-    document.getElementById("standardSettings");
+    document.getElementById(
+        "standardSettings"
+    );
+
 
 const stairSettings =
-    document.getElementById("stairSettings");
+    document.getElementById(
+        "stairSettings"
+    );
 
 
 const intervalSelect =
-    document.getElementById("interval");
+    document.getElementById(
+        "interval"
+    );
+
 
 const restSelect =
-    document.getElementById("rest");
+    document.getElementById(
+        "rest"
+    );
+
 
 const repetitionsSelect =
-    document.getElementById("repetitions");
+    document.getElementById(
+        "repetitions"
+    );
 
 
 const stairCountSelect =
-    document.getElementById("stairCount");
+    document.getElementById(
+        "stairCount"
+    );
+
 
 const stairIntervals =
-    document.getElementById("stairIntervals");
+    document.getElementById(
+        "stairIntervals"
+    );
+
 
 const stairRestSelect =
-    document.getElementById("stairRest");
+    document.getElementById(
+        "stairRest"
+    );
 
 
 const startButton =
-    document.getElementById("startButton");
+    document.getElementById(
+        "startButton"
+    );
+
 
 const stopButton =
-    document.getElementById("stopButton");
+    document.getElementById(
+        "stopButton"
+    );
+
 
 const againButton =
-    document.getElementById("againButton");
+    document.getElementById(
+        "againButton"
+    );
 
 
 const settingsSection =
-    document.getElementById("settings");
+    document.getElementById(
+        "settings"
+    );
+
 
 const timerSection =
-    document.getElementById("timerSection");
+    document.getElementById(
+        "timerSection"
+    );
+
 
 const finishedSection =
-    document.getElementById("finishedSection");
+    document.getElementById(
+        "finishedSection"
+    );
 
 
 const phaseDisplay =
-    document.getElementById("phaseDisplay");
+    document.getElementById(
+        "phaseDisplay"
+    );
+
 
 const timerDisplay =
-    document.getElementById("timerDisplay");
+    document.getElementById(
+        "timerDisplay"
+    );
+
 
 const repetitionDisplay =
-    document.getElementById("repetitionDisplay");
+    document.getElementById(
+        "repetitionDisplay"
+    );
+
+
+const wakeLockStatus =
+    document.getElementById(
+        "wakeLockStatus"
+    );
 
 
 // ==========================================
@@ -171,125 +591,16 @@ let workoutMode = "standard";
 
 
 // ==========================================
-// SKAPA TRAPPINTERVALL
-// ==========================================
-
-function createStairIntervals() {
-
-    const count =
-        parseInt(stairCountSelect.value);
-
-
-    stairIntervals.innerHTML = "";
-
-
-    const title =
-        document.createElement("div");
-
-    title.className = "stair-title";
-
-    title.textContent =
-        "Ställ in varje intervall:";
-
-    stairIntervals.appendChild(title);
-
-
-    for (let i = 0; i < count; i++) {
-
-        const wrapper =
-            document.createElement("div");
-
-        wrapper.className = "stair-item";
-
-
-        const label =
-            document.createElement("label");
-
-        label.textContent =
-            "Intervall " + (i + 1);
-
-
-        const select =
-            document.createElement("select");
-
-        select.className =
-            "stair-duration";
-
-
-        select.dataset.index = i;
-
-
-        const values = [
-            20,
-            40,
-            60,
-            80,
-            100,
-            120,
-            140,
-            160,
-            180
-        ];
-
-
-        values.forEach(seconds => {
-
-            const option =
-                document.createElement("option");
-
-            option.value = seconds;
-
-            option.textContent =
-                formatTime(seconds);
-
-
-            // Första versionen av trappan:
-            // 1:00 -> 0:40 -> 0:20 ->
-            // 0:40 -> 1:00
-
-            const defaultPattern = [
-                60,
-                40,
-                20,
-                40,
-                60
-            ];
-
-
-            if (
-                i < defaultPattern.length &&
-                seconds === defaultPattern[i]
-            ) {
-
-                option.selected = true;
-
-            }
-
-
-            select.appendChild(option);
-
-        });
-
-
-        wrapper.appendChild(label);
-
-        wrapper.appendChild(select);
-
-        stairIntervals.appendChild(wrapper);
-
-    }
-
-}
-
-
-// ==========================================
 // FORMATERA TID
 // ==========================================
 
 function formatTime(seconds) {
 
     const minutes =
-        Math.floor(seconds / 60);
+        Math.floor(
+            seconds / 60
+        );
+
 
     const remainingSeconds =
         seconds % 60;
@@ -305,48 +616,226 @@ function formatTime(seconds) {
 
 
 // ==========================================
-// BYT TILL STANDARD
+// SKAPA TRAPPA
+// ==========================================
+
+function createStairIntervals() {
+
+    const count =
+        parseInt(
+            stairCountSelect.value
+        );
+
+
+    stairIntervals.innerHTML = "";
+
+
+    const title =
+        document.createElement(
+            "div"
+        );
+
+
+    title.className =
+        "stair-title";
+
+
+    title.textContent =
+        "Ställ in varje intervall:";
+
+
+    stairIntervals.appendChild(
+        title
+    );
+
+
+    const values = [
+        20,
+        40,
+        60,
+        80,
+        100,
+        120,
+        140,
+        160,
+        180
+    ];
+
+
+    const defaultPattern = [
+        60,
+        40,
+        20,
+        40,
+        60
+    ];
+
+
+    for (
+        let i = 0;
+        i < count;
+        i++
+    ) {
+
+        const wrapper =
+            document.createElement(
+                "div"
+            );
+
+
+        wrapper.className =
+            "stair-item";
+
+
+        const label =
+            document.createElement(
+                "label"
+            );
+
+
+        label.textContent =
+            "Intervall " +
+            (i + 1);
+
+
+        const select =
+            document.createElement(
+                "select"
+            );
+
+
+        select.className =
+            "stair-duration";
+
+
+        select.dataset.index =
+            i;
+
+
+        values.forEach(
+            function (seconds) {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
+
+
+                option.value =
+                    seconds;
+
+
+                option.textContent =
+                    formatTime(
+                        seconds
+                    );
+
+
+                if (
+                    i <
+                    defaultPattern.length &&
+                    seconds ===
+                    defaultPattern[i]
+                ) {
+
+                    option.selected =
+                        true;
+
+                }
+
+
+                select.appendChild(
+                    option
+                );
+
+            }
+        );
+
+
+        wrapper.appendChild(
+            label
+        );
+
+
+        wrapper.appendChild(
+            select
+        );
+
+
+        stairIntervals.appendChild(
+            wrapper
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// STANDARDLÄGE
 // ==========================================
 
 standardModeButton.addEventListener(
     "click",
     function () {
 
-        workoutMode = "standard";
+        workoutMode =
+            "standard";
 
 
-        standardModeButton.classList.add("active");
+        standardModeButton.classList.add(
+            "active"
+        );
 
-        stairModeButton.classList.remove("active");
+
+        stairModeButton.classList.remove(
+            "active"
+        );
 
 
-        standardSettings.classList.remove("hidden");
+        standardSettings.classList.remove(
+            "hidden"
+        );
 
-        stairSettings.classList.add("hidden");
+
+        stairSettings.classList.add(
+            "hidden"
+        );
 
     }
 );
 
 
 // ==========================================
-// BYT TILL TRAPPA
+// TRAPPLÄGE
 // ==========================================
 
 stairModeButton.addEventListener(
     "click",
     function () {
 
-        workoutMode = "stair";
+        workoutMode =
+            "stair";
 
 
-        stairModeButton.classList.add("active");
+        stairModeButton.classList.add(
+            "active"
+        );
 
-        standardModeButton.classList.remove("active");
+
+        standardModeButton.classList.remove(
+            "active"
+        );
 
 
-        stairSettings.classList.remove("hidden");
+        stairSettings.classList.remove(
+            "hidden"
+        );
 
-        standardSettings.classList.add("hidden");
+
+        standardSettings.classList.add(
+            "hidden"
+        );
 
 
         createStairIntervals();
@@ -356,7 +845,7 @@ stairModeButton.addEventListener(
 
 
 // ==========================================
-// ÄNDRA ANTAL TRAPPINTERVALLER
+// ÄNDRA ANTAL TRAPPINTERVALL
 // ==========================================
 
 stairCountSelect.addEventListener(
@@ -369,36 +858,64 @@ stairCountSelect.addEventListener(
 );
 
 
-// Skapa trappan direkt
+// Skapa standardtrappan direkt.
+
 createStairIntervals();
 
 
 // ==========================================
-// STARTA TRÄNING
+// STARTA
 // ==========================================
 
 startButton.addEventListener(
     "click",
-    function () {
+    async function () {
 
-        initAudio();
+        // Väldigt viktigt:
+        // ljudmotorn startas direkt efter
+        // användarens tryck på STARTA.
+
+        await prepareAudio();
 
 
-        if (workoutMode === "standard") {
+        // Försök hålla skärmen aktiv.
+
+        await requestWakeLock();
+
+
+        workoutIsRunning =
+            true;
+
+
+        // ==================================
+        // STANDARD
+        // ==================================
+
+        if (
+            workoutMode ===
+            "standard"
+        ) {
 
             const intervalSeconds =
-                parseInt(intervalSelect.value);
+                parseInt(
+                    intervalSelect.value
+                );
 
 
             const repetitions =
-                parseInt(repetitionsSelect.value);
+                parseInt(
+                    repetitionsSelect.value
+                );
 
 
             restSeconds =
-                parseInt(restSelect.value);
+                parseInt(
+                    restSelect.value
+                );
 
 
-            intervalDurations = [];
+            intervalDurations =
+                [];
 
 
             for (
@@ -413,10 +930,19 @@ startButton.addEventListener(
 
             }
 
-        } else {
+        }
+
+
+        // ==================================
+        // TRAPPA
+        // ==================================
+
+        else {
 
             restSeconds =
-                parseInt(stairRestSelect.value);
+                parseInt(
+                    stairRestSelect.value
+                );
 
 
             const stairSelects =
@@ -425,34 +951,59 @@ startButton.addEventListener(
                 );
 
 
-            intervalDurations = [];
+            intervalDurations =
+                [];
 
 
-            stairSelects.forEach(select => {
+            stairSelects.forEach(
+                function (select) {
 
-                intervalDurations.push(
-                    parseInt(select.value)
-                );
+                    intervalDurations.push(
+                        parseInt(
+                            select.value
+                        )
+                    );
 
-            });
+                }
+            );
 
         }
 
 
-        if (intervalDurations.length === 0) {
+        if (
+            intervalDurations.length === 0
+        ) {
+
+            workoutIsRunning =
+                false;
+
+            await releaseWakeLock();
+
             return;
+
         }
 
 
-        intervalIndex = 0;
+        intervalIndex =
+            0;
 
 
-        settingsSection.classList.add("hidden");
+        settingsSection.classList.add(
+            "hidden"
+        );
 
-        finishedSection.classList.add("hidden");
 
-        timerSection.classList.remove("hidden");
+        finishedSection.classList.add(
+            "hidden"
+        );
 
+
+        timerSection.classList.remove(
+            "hidden"
+        );
+
+
+        // Uppdatera timer direkt.
 
         startInterval();
 
@@ -470,7 +1021,9 @@ function startInterval() {
 
 
     timeLeft =
-        intervalDurations[intervalIndex];
+        intervalDurations[
+            intervalIndex
+        ];
 
 
     phaseDisplay.textContent =
@@ -490,52 +1043,57 @@ function startInterval() {
     updateDisplay();
 
 
-    timer = setInterval(
-        function () {
+    timer =
+        setInterval(
+            function () {
 
-            timeLeft--;
-
-
-            updateDisplay();
+                timeLeft--;
 
 
-            // Nedräkning 3 - 2 - 1
-
-            if (
-                timeLeft <= 3 &&
-                timeLeft > 0
-            ) {
-
-                playBeep();
-
-                vibrate();
-
-            }
+                updateDisplay();
 
 
-            if (timeLeft <= 0) {
-
-                clearInterval(timer);
-
+                // 3 - 2 - 1
 
                 if (
-                    intervalIndex <
-                    intervalDurations.length - 1
+                    timeLeft <= 3 &&
+                    timeLeft > 0
                 ) {
 
-                    startRest();
+                    playBeep();
 
-                } else {
-
-                    finishWorkout();
+                    vibrate();
 
                 }
 
-            }
 
-        },
-        1000
-    );
+                if (
+                    timeLeft <= 0
+                ) {
+
+                    clearInterval(
+                        timer
+                    );
+
+
+                    if (
+                        intervalIndex <
+                        intervalDurations.length - 1
+                    ) {
+
+                        startRest();
+
+                    } else {
+
+                        finishWorkout();
+
+                    }
+
+                }
+
+            },
+            1000
+        );
 
 }
 
@@ -549,7 +1107,8 @@ function startRest() {
     clearInterval(timer);
 
 
-    timeLeft = restSeconds;
+    timeLeft =
+        restSeconds;
 
 
     phaseDisplay.textContent =
@@ -569,56 +1128,63 @@ function startRest() {
     updateDisplay();
 
 
-    timer = setInterval(
-        function () {
+    timer =
+        setInterval(
+            function () {
 
-            timeLeft--;
-
-
-            updateDisplay();
+                timeLeft--;
 
 
-            // Nedräkning 3 - 2 - 1
-
-            if (
-                timeLeft <= 3 &&
-                timeLeft > 0
-            ) {
-
-                playBeep();
-
-                vibrate();
-
-            }
+                updateDisplay();
 
 
-            if (timeLeft <= 0) {
+                // 3 - 2 - 1
 
-                clearInterval(timer);
+                if (
+                    timeLeft <= 3 &&
+                    timeLeft > 0
+                ) {
+
+                    playBeep();
+
+                    vibrate();
+
+                }
 
 
-                intervalIndex++;
+                if (
+                    timeLeft <= 0
+                ) {
+
+                    clearInterval(
+                        timer
+                    );
 
 
-                startInterval();
+                    intervalIndex++;
 
-            }
 
-        },
-        1000
-    );
+                    startInterval();
+
+                }
+
+            },
+            1000
+        );
 
 }
 
 
 // ==========================================
-// UPPDATERA DISPLAY
+// DISPLAY
 // ==========================================
 
 function updateDisplay() {
 
     timerDisplay.textContent =
-        formatTime(timeLeft);
+        formatTime(
+            timeLeft
+        );
 
 
     repetitionDisplay.textContent =
@@ -631,81 +1197,38 @@ function updateDisplay() {
 
 
 // ==========================================
-// TRÄNING KLAR
+// KLAR
 // ==========================================
 
-function finishWorkout() {
+async function finishWorkout() {
 
     clearInterval(timer);
 
 
-    timerSection.classList.add("hidden");
+    workoutIsRunning =
+        false;
 
-    finishedSection.classList.remove("hidden");
+
+    await releaseWakeLock();
 
 
-    // Långare signal när träningen är klar
+    timerSection.classList.add(
+        "hidden"
+    );
+
+
+    finishedSection.classList.remove(
+        "hidden"
+    );
+
 
     playFinishSound();
 
-}
 
+    // Även en liten vibration vid slutet
+    // om enheten stöder vibration.
 
-// ==========================================
-// KLAR-LJUD
-// ==========================================
-
-function playFinishSound() {
-
-    if (!audioContext) {
-        return;
-    }
-
-
-    const oscillator =
-        audioContext.createOscillator();
-
-    const gainNode =
-        audioContext.createGain();
-
-
-    oscillator.connect(gainNode);
-
-    gainNode.connect(audioContext.destination);
-
-
-    oscillator.type = "sine";
-
-
-    oscillator.frequency.setValueAtTime(
-        600,
-        audioContext.currentTime
-    );
-
-
-    oscillator.frequency.setValueAtTime(
-        900,
-        audioContext.currentTime + 0.2
-    );
-
-
-    gainNode.gain.setValueAtTime(
-        0.3,
-        audioContext.currentTime
-    );
-
-
-    gainNode.gain.exponentialRampToValueAtTime(
-        0.001,
-        audioContext.currentTime + 0.5
-    );
-
-
-    oscillator.start();
-
-    oscillator.stop(
-        audioContext.currentTime + 0.5
-    );
+    vibrate();
 
 }
 
@@ -716,25 +1239,45 @@ function playFinishSound() {
 
 stopButton.addEventListener(
     "click",
-    function () {
+    async function () {
 
         clearInterval(timer);
 
 
-        timerSection.classList.add("hidden");
+        workoutIsRunning =
+            false;
 
-        finishedSection.classList.add("hidden");
 
-        settingsSection.classList.remove("hidden");
+        await releaseWakeLock();
+
+
+        timerSection.classList.add(
+            "hidden"
+        );
+
+
+        finishedSection.classList.add(
+            "hidden"
+        );
+
+
+        settingsSection.classList.remove(
+            "hidden"
+        );
 
 
         timerSection.classList.remove(
             "interval-mode"
         );
 
+
         timerSection.classList.remove(
             "rest-mode"
         );
+
+
+        wakeLockStatus.textContent =
+            "🔒 Skärmen hålls aktiv";
 
     }
 );
@@ -748,9 +1291,14 @@ againButton.addEventListener(
     "click",
     function () {
 
-        finishedSection.classList.add("hidden");
+        finishedSection.classList.add(
+            "hidden"
+        );
 
-        settingsSection.classList.remove("hidden");
+
+        settingsSection.classList.remove(
+            "hidden"
+        );
 
     }
 );

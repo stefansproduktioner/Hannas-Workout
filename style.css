@@ -2,29 +2,49 @@
     box-sizing: border-box;
 }
 
+
+html {
+    min-height: 100%;
+}
+
+
 body {
     margin: 0;
     padding: 0;
 
-    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
     background: #f2f4f7;
 
     color: #222;
 
-    min-height: 100vh;
-
     -webkit-tap-highlight-color: transparent;
 }
 
 
+button,
+select {
+    font-family: inherit;
+}
+
+
+/* ==========================================
+   HUVUD
+========================================== */
+
 .container {
     width: 100%;
+
     max-width: 520px;
 
     margin: 0 auto;
 
-    padding: 20px 16px 40px;
+    padding: 16px 14px 40px;
 }
 
 
@@ -33,9 +53,13 @@ h1 {
 
     font-size: 32px;
 
-    margin: 10px 0 25px;
+    margin: 8px 0 22px;
 }
 
+
+/* ==========================================
+   SEKTIONER
+========================================== */
 
 section {
     background: white;
@@ -44,33 +68,36 @@ section {
 
     padding: 22px;
 
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.08);
 }
 
 
-/* =========================
+/* ==========================================
    LÄGEN
-========================= */
+========================================== */
 
 .mode-buttons {
     display: flex;
 
     gap: 10px;
 
-    margin-bottom: 25px;
+    margin-bottom: 24px;
 }
 
 
 .mode-button {
     flex: 1;
 
+    min-height: 52px;
+
     border: none;
 
     border-radius: 12px;
 
-    padding: 15px 10px;
+    padding: 12px 8px;
 
     font-size: 17px;
 
@@ -93,20 +120,25 @@ section {
 }
 
 
-/* =========================
-   INSTÄLLNINGAR
-========================= */
+.mode-button:active {
+    transform: scale(0.98);
+}
+
+
+/* ==========================================
+   FORMULÄR
+========================================== */
 
 label {
     display: block;
 
-    font-size: 16px;
-
-    font-weight: bold;
-
     margin-top: 18px;
 
     margin-bottom: 7px;
+
+    font-size: 16px;
+
+    font-weight: bold;
 }
 
 
@@ -115,17 +147,17 @@ select {
 
     height: 54px;
 
+    padding: 0 14px;
+
     border: 2px solid #ddd;
 
     border-radius: 12px;
 
     background: white;
 
-    padding: 0 14px;
+    color: #222;
 
     font-size: 19px;
-
-    color: #222;
 
     cursor: pointer;
 }
@@ -138,18 +170,18 @@ select:focus {
 }
 
 
-/* =========================
-   TRAPPINTERVALLER
-========================= */
+/* ==========================================
+   TRAPPINTERVALL
+========================================== */
 
 .stair-title {
-    font-size: 18px;
-
-    font-weight: bold;
-
     margin-top: 22px;
 
     margin-bottom: 8px;
+
+    font-size: 18px;
+
+    font-weight: bold;
 }
 
 
@@ -167,14 +199,9 @@ select:focus {
 }
 
 
-/* =========================
-   KNAPPAR
-========================= */
-
-button {
-    font-family: inherit;
-}
-
+/* ==========================================
+   START
+========================================== */
 
 .start-button {
     width: 100%;
@@ -199,7 +226,8 @@ button {
 
     touch-action: manipulation;
 
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 
@@ -208,12 +236,105 @@ button {
 }
 
 
+/* ==========================================
+   TIMER
+========================================== */
+
+#timerSection {
+    text-align: center;
+
+    padding: 28px 16px;
+}
+
+
+.phase {
+    font-size: 25px;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 12px;
+}
+
+
+#timerDisplay {
+    font-size:
+        clamp(70px, 23vw, 120px);
+
+    line-height: 1;
+
+    font-weight: bold;
+
+    font-variant-numeric:
+        tabular-nums;
+
+    margin: 25px 0;
+}
+
+
+#repetitionDisplay {
+    font-size: 20px;
+
+    font-weight: bold;
+
+    margin-bottom: 8px;
+}
+
+
+/* ==========================================
+   INTERVALL
+========================================== */
+
+#timerSection.interval-mode {
+    background: #e9f8ed;
+}
+
+
+#timerSection.interval-mode .phase {
+    color: #198754;
+}
+
+
+/* ==========================================
+   VILA
+========================================== */
+
+#timerSection.rest-mode {
+    background: #fff3cd;
+}
+
+
+#timerSection.rest-mode .phase {
+    color: #d97706;
+}
+
+
+/* ==========================================
+   WAKE LOCK STATUS
+========================================== */
+
+.wake-status {
+    margin-top: 8px;
+
+    font-size: 14px;
+
+    color: #198754;
+
+    min-height: 20px;
+}
+
+
+/* ==========================================
+   STOPP
+========================================== */
+
 .stop-button {
     width: 100%;
 
     min-height: 60px;
 
-    margin-top: 30px;
+    margin-top: 28px;
 
     border: none;
 
@@ -238,77 +359,9 @@ button {
 }
 
 
-/* =========================
-   TIMER
-========================= */
-
-#timerSection {
-    text-align: center;
-
-    padding: 30px 18px;
-}
-
-
-.phase {
-    font-size: 25px;
-
-    font-weight: bold;
-
-    margin-bottom: 15px;
-
-    letter-spacing: 1px;
-}
-
-
-#timerDisplay {
-    font-size: clamp(70px, 22vw, 120px);
-
-    line-height: 1;
-
-    font-weight: bold;
-
-    margin: 15px 0 20px;
-
-    font-variant-numeric: tabular-nums;
-}
-
-
-#repetitionDisplay {
-    font-size: 20px;
-
-    font-weight: bold;
-
-    margin-bottom: 10px;
-}
-
-
-/* Intervalläge */
-
-#timerSection.interval-mode {
-    background: #e9f8ed;
-}
-
-
-#timerSection.interval-mode .phase {
-    color: #198754;
-}
-
-
-/* Viloläge */
-
-#timerSection.rest-mode {
-    background: #fff3cd;
-}
-
-
-#timerSection.rest-mode .phase {
-    color: #d97706;
-}
-
-
-/* =========================
+/* ==========================================
    KLAR
-========================= */
+========================================== */
 
 #finishedSection {
     text-align: center;
@@ -338,44 +391,52 @@ button {
 }
 
 
-/* =========================
-   HJÄLPKLASSER
-========================= */
+/* ==========================================
+   HJÄLPKLASS
+========================================== */
 
 .hidden {
     display: none !important;
 }
 
 
-/* =========================
+/* ==========================================
    MOBIL
-========================= */
+========================================== */
 
 @media (max-width: 480px) {
 
     .container {
-        padding: 12px 10px 30px;
+        padding:
+            10px
+            10px
+            30px;
     }
 
 
     h1 {
         font-size: 27px;
 
-        margin: 8px 0 18px;
+        margin:
+            7px
+            0
+            18px;
     }
 
 
     section {
-        padding: 18px 15px;
+        padding:
+            18px
+            15px;
 
-        border-radius: 16px;
+        border-radius: 17px;
     }
 
 
     .mode-button {
-        font-size: 16px;
+        min-height: 54px;
 
-        padding: 14px 8px;
+        font-size: 16px;
     }
 
 
@@ -387,7 +448,9 @@ button {
 
 
     #timerSection {
-        padding: 30px 10px;
+        padding:
+            30px
+            10px;
     }
 
 
@@ -397,13 +460,25 @@ button {
 
 
     #timerDisplay {
-        font-size: clamp(72px, 24vw, 110px);
+        font-size:
+            clamp(
+                72px,
+                24vw,
+                110px
+            );
 
-        margin: 25px 0;
+        margin:
+            28px
+            0;
     }
 
 
     #repetitionDisplay {
         font-size: 18px;
+    }
+
+
+    .wake-status {
+        font-size: 13px;
     }
 }

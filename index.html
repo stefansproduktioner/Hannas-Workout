@@ -1,11 +1,21 @@
 <!DOCTYPE html>
 <html lang="sv">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <meta name="theme-color" content="#f2f4f7">
+
     <title>Hannas Workout</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
+
 
 <body>
 
@@ -13,21 +23,36 @@
 
         <h1>🏋️ Hannas Workout</h1>
 
-        <!-- INSTÄLLNINGAR -->
+
+        <!-- =========================
+             INSTÄLLNINGAR
+        ========================== -->
+
         <section id="settings">
 
             <div class="mode-buttons">
-                <button id="standardModeButton" class="mode-button active">
+
+                <button
+                    id="standardModeButton"
+                    class="mode-button active"
+                    type="button"
+                >
                     Standard
                 </button>
 
-                <button id="stairModeButton" class="mode-button">
+                <button
+                    id="stairModeButton"
+                    class="mode-button"
+                    type="button"
+                >
                     🪜 Trappa
                 </button>
+
             </div>
 
 
-            <!-- STANDARDLÄGE -->
+            <!-- STANDARD -->
+
             <div id="standardSettings">
 
                 <label for="interval">
@@ -35,6 +60,7 @@
                 </label>
 
                 <select id="interval">
+
                     <option value="20">00:20</option>
                     <option value="40">00:40</option>
                     <option value="60" selected>01:00</option>
@@ -44,6 +70,7 @@
                     <option value="140">02:20</option>
                     <option value="160">02:40</option>
                     <option value="180">03:00</option>
+
                 </select>
 
 
@@ -52,6 +79,7 @@
                 </label>
 
                 <select id="rest">
+
                     <option value="20">00:20</option>
                     <option value="40" selected>00:40</option>
                     <option value="60">01:00</option>
@@ -61,6 +89,7 @@
                     <option value="140">02:20</option>
                     <option value="160">02:40</option>
                     <option value="180">03:00</option>
+
                 </select>
 
 
@@ -69,6 +98,7 @@
                 </label>
 
                 <select id="repetitions">
+
                     <option value="2">2</option>
                     <option value="3">3</option>
                     <option value="4">4</option>
@@ -78,19 +108,25 @@
                     <option value="8">8</option>
                     <option value="9">9</option>
                     <option value="10">10</option>
+
                 </select>
 
             </div>
 
 
-            <!-- TRAPP-LÄGE -->
-            <div id="stairSettings" class="hidden">
+            <!-- TRAPPA -->
+
+            <div
+                id="stairSettings"
+                class="hidden"
+            >
 
                 <label for="stairCount">
                     Antal intervaller
                 </label>
 
                 <select id="stairCount">
+
                     <option value="2">2</option>
                     <option value="3">3</option>
                     <option value="4">4</option>
@@ -100,6 +136,7 @@
                     <option value="8">8</option>
                     <option value="9">9</option>
                     <option value="10">10</option>
+
                 </select>
 
 
@@ -111,6 +148,7 @@
                 </label>
 
                 <select id="stairRest">
+
                     <option value="20">00:20</option>
                     <option value="40" selected>00:40</option>
                     <option value="60">01:00</option>
@@ -120,50 +158,98 @@
                     <option value="140">02:20</option>
                     <option value="160">02:40</option>
                     <option value="180">03:00</option>
+
                 </select>
 
             </div>
 
 
-            <button id="startButton" class="start-button">
+            <button
+                id="startButton"
+                class="start-button"
+                type="button"
+            >
                 ▶ STARTA
             </button>
 
         </section>
 
 
-        <!-- TIMER -->
-        <section id="timerSection" class="hidden">
+        <!-- =========================
+             TIMER
+        ========================== -->
 
-            <div id="phaseDisplay" class="phase">
+        <section
+            id="timerSection"
+            class="hidden"
+        >
+
+            <div
+                id="phaseDisplay"
+                class="phase"
+            >
                 INTERVALL
             </div>
+
 
             <div id="timerDisplay">
                 01:00
             </div>
 
+
             <div id="repetitionDisplay">
                 Intervall 1 / 5
             </div>
 
-            <button id="stopButton" class="stop-button">
+
+            <div
+                id="wakeLockStatus"
+                class="wake-status"
+            >
+                🔒 Skärmen hålls aktiv
+            </div>
+
+
+            <button
+                id="stopButton"
+                class="stop-button"
+                type="button"
+            >
                 ■ STOPPA
             </button>
 
         </section>
 
 
-        <!-- KLAR -->
-        <section id="finishedSection" class="hidden">
+        <!-- =========================
+             KLAR
+        ========================== -->
+
+        <section
+            id="finishedSection"
+            class="hidden"
+        >
 
             <div class="finished">
-                <div class="finished-icon">🎉</div>
+
+                <div class="finished-icon">
+                    🎉
+                </div>
+
                 <h2>KLAR!</h2>
-                <p>Bra jobbat!</p>
+
+                <p>
+                    Bra jobbat!
+                </p>
+
             </div>
 
-            <button id="againButton" class="start-button">
+
+            <button
+                id="againButton"
+                class="start-button"
+                type="button"
+            >
                 🔄 KÖR IGEN
             </button>
 
@@ -175,4 +261,5 @@
     <script src="app.js"></script>
 
 </body>
+
 </html>
