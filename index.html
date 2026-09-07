@@ -2,32 +2,58 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intervallträning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hannas Workout</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <div class="app">
+    <div class="container">
 
-        <h1>Intervallträning</h1>
-        <p class="subtitle">Ställ in ditt träningspass</p>
+        <h1>🏋️ Hannas Workout</h1>
+
+        <!-- INSTÄLLNINGAR -->
+        <section id="settings">
+
+            <div class="mode-buttons">
+                <button id="standardModeButton" class="mode-button active">
+                    Standard
+                </button>
+
+                <button id="stairModeButton" class="mode-button">
+                    🪜 Trappa
+                </button>
+            </div>
 
 
-        <div class="settings">
+            <!-- STANDARDLÄGE -->
+            <div id="standardSettings">
 
-            <!-- INTERVALLTID -->
-            <div class="setting">
-
-                <label for="intervalTime">
-                    Hur lång intervall vill du ha?
+                <label for="interval">
+                    Intervall
                 </label>
 
-                <select id="intervalTime">
-
+                <select id="interval">
                     <option value="20">00:20</option>
                     <option value="40">00:40</option>
+                    <option value="60" selected>01:00</option>
+                    <option value="80">01:20</option>
+                    <option value="100">01:40</option>
+                    <option value="120">02:00</option>
+                    <option value="140">02:20</option>
+                    <option value="160">02:40</option>
+                    <option value="180">03:00</option>
+                </select>
+
+
+                <label for="rest">
+                    Vila mellan intervaller
+                </label>
+
+                <select id="rest">
+                    <option value="20">00:20</option>
+                    <option value="40" selected>00:40</option>
                     <option value="60">01:00</option>
                     <option value="80">01:20</option>
                     <option value="100">01:40</option>
@@ -35,88 +61,113 @@
                     <option value="140">02:20</option>
                     <option value="160">02:40</option>
                     <option value="180">03:00</option>
-
                 </select>
 
-            </div>
-
-
-            <!-- VILOTID -->
-            <div class="setting">
-
-                <label for="restTime">
-                    Hur lång vila vill du ha?
-                </label>
-
-                <select id="restTime">
-
-                    <option value="20">00:20</option>
-                    <option value="40">00:40</option>
-                    <option value="60">01:00</option>
-                    <option value="80">01:20</option>
-                    <option value="100">01:40</option>
-                    <option value="120">02:00</option>
-                    <option value="140">02:20</option>
-                    <option value="160">02:40</option>
-                    <option value="180">03:00</option>
-
-                </select>
-
-            </div>
-
-
-            <!-- REPETITIONER -->
-            <div class="setting">
 
                 <label for="repetitions">
-                    Hur många gånger vill du repetera?
+                    Antal intervaller
                 </label>
 
                 <select id="repetitions">
-
-                    <option value="2">2 gånger</option>
-                    <option value="3">3 gånger</option>
-                    <option value="4">4 gånger</option>
-                    <option value="5">5 gånger</option>
-                    <option value="6">6 gånger</option>
-                    <option value="7">7 gånger</option>
-                    <option value="8">8 gånger</option>
-                    <option value="9">9 gånger</option>
-                    <option value="10">10 gånger</option>
-
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5" selected>5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
                 </select>
 
             </div>
 
-        </div>
+
+            <!-- TRAPP-LÄGE -->
+            <div id="stairSettings" class="hidden">
+
+                <label for="stairCount">
+                    Antal intervaller
+                </label>
+
+                <select id="stairCount">
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5" selected>5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                </select>
 
 
-        <!-- START -->
-        <button id="startButton">
-            STARTA TRÄNING
-        </button>
+                <div id="stairIntervals"></div>
+
+
+                <label for="stairRest">
+                    Vila mellan intervaller
+                </label>
+
+                <select id="stairRest">
+                    <option value="20">00:20</option>
+                    <option value="40" selected>00:40</option>
+                    <option value="60">01:00</option>
+                    <option value="80">01:20</option>
+                    <option value="100">01:40</option>
+                    <option value="120">02:00</option>
+                    <option value="140">02:20</option>
+                    <option value="160">02:40</option>
+                    <option value="180">03:00</option>
+                </select>
+
+            </div>
+
+
+            <button id="startButton" class="start-button">
+                ▶ STARTA
+            </button>
+
+        </section>
 
 
         <!-- TIMER -->
-        <div id="timerSection" class="timer-section">
+        <section id="timerSection" class="hidden">
 
-            <div id="phase">
-                Redo?
+            <div id="phaseDisplay" class="phase">
+                INTERVALL
             </div>
 
-            <div id="timer">
-                00:00
+            <div id="timerDisplay">
+                01:00
             </div>
 
-            <div id="repetition">
-                Repetition 0 / 0
+            <div id="repetitionDisplay">
+                Intervall 1 / 5
             </div>
 
-            <button id="stopButton">
-                STOPPA
+            <button id="stopButton" class="stop-button">
+                ■ STOPPA
             </button>
 
-        </div>
+        </section>
+
+
+        <!-- KLAR -->
+        <section id="finishedSection" class="hidden">
+
+            <div class="finished">
+                <div class="finished-icon">🎉</div>
+                <h2>KLAR!</h2>
+                <p>Bra jobbat!</p>
+            </div>
+
+            <button id="againButton" class="start-button">
+                🔄 KÖR IGEN
+            </button>
+
+        </section>
 
     </div>
 
